@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.gnidenko.userservice.dto.CreateRequestUserDto;
+import ru.gnidenko.userservice.dto.UserDto;
 import ru.gnidenko.userservice.exception.NotFoundException;
 import ru.gnidenko.userservice.exception.UsernameExistsException;
 import ru.gnidenko.userservice.mapper.UserMapperImpl;
@@ -16,6 +17,8 @@ import ru.gnidenko.userservice.model.UserRole;
 import ru.gnidenko.userservice.repo.UserRepo;
 import ru.gnidenko.userservice.repo.UserRoleRepo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -101,5 +104,37 @@ class UserServiceTest {
         Mockito.when(userRepo.findById(id)).thenReturn(Optional.of(new User()));
         userService.deleteUser(id);
         Mockito.verify(userRepo, Mockito.times(1)).findById(id);
+    }
+
+    @Test
+    void testFindUserWithIdWhichNotExists() {
+        Long id = 1L;
+        Mockito.when(userRepo.findById(id)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> userService.findUser(id));
+    }
+
+    @Test
+    void testFindUserSucceeds() {
+        Long id = 1L;
+        User user = new User();
+        user.setId(1L);
+        Mockito.when(userRepo.findById(id)).thenReturn(Optional.of(user));
+
+        userService.findUser(id);
+
+        Mockito.verify(userRepo, Mockito.times(1)).findById(id);
+        assertEquals(1L, user.getId());
+    }
+
+    @Test
+    void testFindAllUsers(){
+        Mockito.when(userRepo.findAll()).thenReturn(List.of(
+            new User(), new User(), new User(), new User()
+        ));
+
+        List< UserDto> dtos = userService.findAllUsers();
+
+        Mockito.verify(userRepo, Mockito.times(1)).findAll();
+        assertEquals(4, dtos.size());
     }
 }
