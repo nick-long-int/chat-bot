@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,6 +50,14 @@ public class UserController {
     public List<UserDto> getAllUsers(HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_OK);
         return userService.findAllUsers();
+    }
+
+    @PutMapping("/{id}")
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable Long id, HttpServletResponse response) {
+        checkBodyIsNotNull(userDto);
+        checkBodyIsNotNull(id);
+        response.setStatus(HttpServletResponse.SC_OK);
+        return userService.updateUser(userDto, id);
     }
 
     private <T> void checkBodyIsNotNull(T body){

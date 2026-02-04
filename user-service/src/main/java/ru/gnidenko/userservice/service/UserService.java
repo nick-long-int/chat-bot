@@ -3,6 +3,9 @@ package ru.gnidenko.userservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.gnidenko.userservice.dto.CreateRequestUserDto;
 import ru.gnidenko.userservice.dto.UserDto;
 import ru.gnidenko.userservice.exception.NotFoundException;
@@ -14,6 +17,7 @@ import ru.gnidenko.userservice.repo.UserRoleRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
@@ -25,6 +29,10 @@ public class UserService {
     private final UserRoleRepo roleRepo;
     private final UserMapper userMapper;
 
+    @Transactional(
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
     public UserDto addUser(CreateRequestUserDto userDto) {
         checkUsernameNotExists(userDto.getUsername());
 
@@ -40,12 +48,19 @@ public class UserService {
 
     }
 
+    @Transactional(
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
     public void deleteUser(Long id) {
         User userToDelete = userRepo.findById(id).orElseThrow(
             () -> new NotFoundException("User not found with id: " + id));
         userRepo.delete(userToDelete);
     }
 
+    @Transactional(
+        readOnly = true
+    )
     public UserDto findUser(Long id) {
         User user = userRepo.findById(id)
             .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
@@ -53,6 +68,9 @@ public class UserService {
         return userMapper.toUserDto(user);
     }
 
+    @Transactional(
+        readOnly = true
+    )
     public List<UserDto> findAllUsers() {
         return userRepo.findAll()
             .stream()
@@ -60,9 +78,28 @@ public class UserService {
             .toList();
     }
 
+    @Transactional(
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
+    public UserDto updateUser(UserDto userDto, Long id) {
+        if (Objects.nonNull(userDto.getUsername())){
+            checkUsernameNotExists(userDto.getUsername());
+        }
+
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
+        userMapper.updateUser(userDto, user);
+        user.setUpdatedAt(LocalDateTime.now());
+        return userMapper.toUserDto(user);
+    }
+
     private void checkUsernameNotExists(String username) {
         if (userRepo.findByUsername(username).isPresent()) {
             throw new UsernameExistsException(username + " already exists");
         }
     }
+
+
 }
