@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.gnidenko.userservice.dto.CreateRequestUserDto;
 import ru.gnidenko.userservice.dto.UserDto;
 import ru.gnidenko.userservice.exception.NotFoundException;
-import ru.gnidenko.userservice.exception.UsernameExistsException;
+import ru.gnidenko.userservice.exception.FieldExistsException;
 import ru.gnidenko.userservice.mapper.UserMapper;
 import ru.gnidenko.userservice.model.User;
 import ru.gnidenko.userservice.repo.UserRepo;
@@ -35,6 +35,7 @@ public class UserService {
     )
     public UserDto addUser(CreateRequestUserDto userDto) {
         checkUsernameNotExists(userDto.getUsername());
+        checkEmailNotExists(userDto.getEmail());
 
         User user = userMapper.toUser(userDto);
         user.setRoles(Set.of(roleRepo.findByRole("USER")
@@ -86,6 +87,9 @@ public class UserService {
         if (Objects.nonNull(userDto.getUsername())){
             checkUsernameNotExists(userDto.getUsername());
         }
+        if (Objects.nonNull(userDto.getEmail())){
+            checkEmailNotExists(userDto.getEmail());
+        }
 
         User user = userRepo.findById(id)
             .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
@@ -97,9 +101,14 @@ public class UserService {
 
     private void checkUsernameNotExists(String username) {
         if (userRepo.findByUsername(username).isPresent()) {
-            throw new UsernameExistsException(username + " already exists");
+            throw new FieldExistsException(username + " already exists");
         }
     }
 
+    private void checkEmailNotExists(String email) {
+        if(userRepo.findByEmail(email).isPresent()) {
+            throw new FieldExistsException(email + " already exists");
+        }
+    }
 
 }
