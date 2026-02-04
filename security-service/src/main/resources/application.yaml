@@ -1,0 +1,9 @@
+server:
+  port: 9898
+spring:
+  application:
+    name: security-service
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
