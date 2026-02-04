@@ -1,0 +1,88 @@
+package ru.gnidenko.userservice.service;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import ru.gnidenko.userservice.dto.CreateRequestUserDto;
+import ru.gnidenko.userservice.exception.NotFoundException;
+import ru.gnidenko.userservice.exception.UsernameExistsException;
+import ru.gnidenko.userservice.mapper.UserMapperImpl;
+import ru.gnidenko.userservice.model.User;
+import ru.gnidenko.userservice.model.UserRole;
+import ru.gnidenko.userservice.repo.UserRepo;
+import ru.gnidenko.userservice.repo.UserRoleRepo;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+
+    @Mock
+    private UserRepo userRepo;
+
+    @Mock
+    private UserRoleRepo userRoleRepo;
+
+    @Spy
+    private UserMapperImpl userMapper;
+
+    @InjectMocks
+    private UserService userService;
+
+
+    @Test
+    void testAddUserThrowsUsernameExistsException() {
+        CreateRequestUserDto requestUserDto = new CreateRequestUserDto();
+        requestUserDto.setUsername("username");
+
+        User user = new User();
+        user.setUsername("username");
+
+        Mockito.when(userRepo.findByUsername(requestUserDto.getUsername()))
+            .thenReturn(Optional.of(user));
+
+        assertThrows(UsernameExistsException.class,
+            () -> userService.addUser(requestUserDto));
+    }
+
+    @Test
+    void testAddUserThrowsNotFoundExceptionIfRoleNotExists() {
+        CreateRequestUserDto requestUserDto = new CreateRequestUserDto();
+        requestUserDto.setUsername("username");
+
+        Mockito.when(userRoleRepo.findByRole("USER")).thenThrow(new NotFoundException(requestUserDto.getUsername()));
+
+        assertThrows(NotFoundException.class, () -> userService.addUser(requestUserDto));
+    }
+
+    @Test
+    void testAddUserSucceeds() {
+        CreateRequestUserDto requestUserDto = new CreateRequestUserDto();
+        requestUserDto.setUsername("username");
+        requestUserDto.setPassword("password");
+        requestUserDto.setEmail("email");
+
+        UserRole userRole = new UserRole();
+        userRole.setRole("USER");
+        userRole.setId(1L);
+
+        User user = new User();
+        user.setId(1L);
+
+        Mockito.when(userRepo.findByUsername(Mockito.anyString())).thenReturn(Optional.empty());
+        Mockito.when(userRoleRepo.findByRole("USER")).thenReturn(Optional.of(userRole));
+        Mockito.when(userRepo.save(Mockito.any())).thenReturn(user);
+
+        assertNotNull(userService.addUser(requestUserDto));
+        assertEquals(1L, user.getId());
+
+    }
+}
