@@ -1,6 +1,5 @@
 package ru.gnidenko.userservice.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import ru.gnidenko.userservice.repo.UserRepo;
 import ru.gnidenko.userservice.repo.UserRoleRepo;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -44,6 +44,20 @@ public class UserService {
         User userToDelete = userRepo.findById(id).orElseThrow(
             () -> new NotFoundException("User not found with id: " + id));
         userRepo.delete(userToDelete);
+    }
+
+    public UserDto findUser(Long id) {
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
+        return userMapper.toUserDto(user);
+    }
+
+    public List<UserDto> findAllUsers() {
+        return userRepo.findAll()
+            .stream()
+            .map(userMapper::toUserDto)
+            .toList();
     }
 
     private void checkUsernameNotExists(String username) {
