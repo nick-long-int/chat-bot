@@ -83,6 +83,23 @@ class UserServiceTest {
 
         assertNotNull(userService.addUser(requestUserDto));
         assertEquals(1L, user.getId());
+    }
 
+    @Test
+    void testDeleteUserWithIdWhichNotExists() {
+        Long id = 1L;
+
+        Mockito.when(userRepo.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.deleteUser(id));
+        Mockito.verify(userRepo, Mockito.times(1)).findById(id);
+    }
+
+    @Test
+    void testDeleteUserSucceeds() {
+        Long id = 1L;
+        Mockito.when(userRepo.findById(id)).thenReturn(Optional.of(new User()));
+        userService.deleteUser(id);
+        Mockito.verify(userRepo, Mockito.times(1)).findById(id);
     }
 }

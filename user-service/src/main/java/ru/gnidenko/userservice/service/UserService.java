@@ -40,6 +40,12 @@ public class UserService {
 
     }
 
+    public void deleteUser(Long id) {
+        User userToDelete = userRepo.findById(id).orElseThrow(
+            () -> new NotFoundException("User not found with id: " + id));
+        userRepo.delete(userToDelete);
+    }
+
     private void checkUsernameNotExists(String username) {
         if (userRepo.findByUsername(username).isPresent()) {
             throw new UsernameExistsException(username + " already exists");
