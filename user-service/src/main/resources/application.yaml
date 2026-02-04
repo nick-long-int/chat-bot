@@ -1,0 +1,20 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: user-service
+
+  liquibase:
+    change-log: classpath:db.changelog/db.changelog-master.yaml
+    enabled: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/chat-bot-db
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+
