@@ -137,4 +137,40 @@ class UserServiceTest {
         Mockito.verify(userRepo, Mockito.times(1)).findAll();
         assertEquals(4, dtos.size());
     }
+
+    @Test
+    void testUpdateUserWithUsernameWhichExists() {
+        UserDto userDto = new UserDto();
+        userDto.setUsername("username");
+        Long id = 1L;
+
+        Mockito.when(userRepo.findByUsername("username")).thenReturn(Optional.of(new User()));
+
+        assertThrows(UsernameExistsException.class, () -> userService.updateUser(userDto, id));
+    }
+
+    @Test
+    void testUpdateUserThrowsNotFoundException(){
+        UserDto userDto = new UserDto();
+        Long id = 1L;
+
+        Mockito.when(userRepo.findById(id)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> userService.updateUser(userDto, id));
+    }
+
+    @Test
+    void testUpdateUserSucceeds(){
+        User user = new User();
+        user.setUsername("username");
+        UserDto userDto = new UserDto();
+        userDto.setUsername("updated");
+        Long id = 1L;
+
+        Mockito.when(userRepo.findByUsername(Mockito.anyString())).thenReturn(Optional.empty());
+        Mockito.when(userRepo.findById(id)).thenReturn(Optional.of(user));
+
+        userService.updateUser(userDto, id);
+
+        assertEquals("updated", user.getUsername());
+    }
 }
