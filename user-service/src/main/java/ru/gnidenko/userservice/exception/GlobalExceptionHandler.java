@@ -52,9 +52,9 @@ public class GlobalExceptionHandler {
             .build();
     }
 
-    @ExceptionHandler(UsernameExistsException.class)
+    @ExceptionHandler(FieldExistsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDto handleUsernameExistsException(UsernameExistsException ex) {
+    public ErrorResponseDto handleUsernameExistsException(FieldExistsException ex) {
         log.error(ex.getMessage(), ex);
         return ErrorResponseDto.builder()
             .message(ex.getMessage())

@@ -10,14 +10,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.gnidenko.userservice.dto.CreateRequestUserDto;
 import ru.gnidenko.userservice.dto.UserDto;
 import ru.gnidenko.userservice.exception.NotFoundException;
-import ru.gnidenko.userservice.exception.UsernameExistsException;
+import ru.gnidenko.userservice.exception.FieldExistsException;
 import ru.gnidenko.userservice.mapper.UserMapperImpl;
 import ru.gnidenko.userservice.model.User;
 import ru.gnidenko.userservice.model.UserRole;
 import ru.gnidenko.userservice.repo.UserRepo;
 import ru.gnidenko.userservice.repo.UserRoleRepo;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,8 +51,18 @@ class UserServiceTest {
         Mockito.when(userRepo.findByUsername(requestUserDto.getUsername()))
             .thenReturn(Optional.of(user));
 
-        assertThrows(UsernameExistsException.class,
+        assertThrows(FieldExistsException.class,
             () -> userService.addUser(requestUserDto));
+    }
+
+    @Test
+    void testAddUserThrowsEmailExistsException() {
+        CreateRequestUserDto requestUserDto = new CreateRequestUserDto();
+        requestUserDto.setEmail("email");
+
+        Mockito.when(userRepo.findByEmail(requestUserDto.getEmail())).thenReturn(Optional.of(Mockito.mock(User.class)));
+
+        assertThrows(FieldExistsException.class, () -> userService.addUser(requestUserDto));
     }
 
     @Test
@@ -146,7 +155,7 @@ class UserServiceTest {
 
         Mockito.when(userRepo.findByUsername("username")).thenReturn(Optional.of(new User()));
 
-        assertThrows(UsernameExistsException.class, () -> userService.updateUser(userDto, id));
+        assertThrows(FieldExistsException.class, () -> userService.updateUser(userDto, id));
     }
 
     @Test
@@ -156,6 +165,17 @@ class UserServiceTest {
 
         Mockito.when(userRepo.findById(id)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> userService.updateUser(userDto, id));
+    }
+
+    @Test
+    void testUpdateUserThrowsEmailExistsException(){
+        UserDto userDto = new UserDto();
+        userDto.setEmail("email");
+        Long id = 1L;
+
+        Mockito.when(userRepo.findByEmail("email")).thenReturn(Optional.of(Mockito.mock(User.class)));
+
+        assertThrows(FieldExistsException.class, () -> userService.updateUser(userDto, id));
     }
 
     @Test
