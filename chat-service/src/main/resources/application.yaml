@@ -10,6 +10,7 @@ spring:
       database: chat-db
       host: localhost
       port: 27017
+      uri: mongodb://localhost:27017/chat-db
 
 eureka:
   client:
