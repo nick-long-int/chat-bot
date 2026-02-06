@@ -11,6 +11,5 @@ import lombok.Setter;
 @Setter
 public class MessageDto {
     private String id;
-    private String chatId;
     private String text;
 }
