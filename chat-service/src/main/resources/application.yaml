@@ -12,6 +12,22 @@ spring:
       port: 27017
       uri: mongodb://localhost:27017/chat-db
 
+
+  cloud:
+    function:
+      definition: producer;consumer
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:29092
+          auto-create-topics: true
+      bindings:
+        producer-out-0:
+          destination: commands-topic
+        consumer-in-0:
+          destination: commands-topic
+
+
 eureka:
   client:
     register-with-eureka: true
@@ -20,3 +36,5 @@ eureka:
   instance:
     prefer-ip-address: true
 
+
+commands.topic: producer-out-0
