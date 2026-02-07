@@ -2,6 +2,7 @@ package ru.gnidenko.userservice.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -60,6 +61,17 @@ public class GlobalExceptionHandler {
             .message(ex.getMessage())
             .timestamp(LocalDateTime.now())
             .status(400)
+            .build();
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponseDto handleBadCredentialsException(BadCredentialsException ex) {
+        log.error(ex.getMessage(), ex);
+        return ErrorResponseDto.builder()
+            .status(403)
+            .timestamp(LocalDateTime.now())
+            .message(ex.getMessage())
             .build();
     }
 

@@ -2,7 +2,7 @@ package ru.gnidenko.userservice.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +18,7 @@ import ru.gnidenko.userservice.service.UserService;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -27,6 +28,9 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id, HttpServletResponse response) {
+        if (!getSetRolesFromClaims().contains("ADMIN")) {
+            throw new BadCredentialsException("You are not allowed");
+        }
         checkBodyIsNotNull(id);
         response.setStatus(HttpServletResponse.SC_OK);
         userService.deleteUser(id);
@@ -41,6 +45,9 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAllUsers(HttpServletResponse response) {
+        if (!getSetRolesFromClaims().contains("ADMIN")) {
+            throw new BadCredentialsException("You are not allowed");
+        }
         response.setStatus(HttpServletResponse.SC_OK);
         return userService.findAllUsers();
     }
@@ -60,10 +67,15 @@ public class UserController {
     }
 
     private Long getUserIdFromClaims() {
-        Authentication authentication = SecurityContextHolder.getContext()
-            .getAuthentication();
-        Jwt principal = (Jwt) authentication.getPrincipal();
-        return principal.getClaim("userId");
+        return getJwtFromPrincipal().getClaim("userId");
+    }
+
+    private List<String> getSetRolesFromClaims() {
+        return getJwtFromPrincipal().getClaim("roles");
+    }
+
+    private Jwt getJwtFromPrincipal() {
+        return (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }
