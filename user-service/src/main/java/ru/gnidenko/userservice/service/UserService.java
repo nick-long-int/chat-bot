@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.gnidenko.userservice.dto.CreateRequestUserDto;
 import ru.gnidenko.userservice.dto.UserDto;
-import ru.gnidenko.userservice.exception.NotFoundException;
 import ru.gnidenko.userservice.exception.FieldExistsException;
+import ru.gnidenko.userservice.exception.NotFoundException;
 import ru.gnidenko.userservice.mapper.UserMapper;
 import ru.gnidenko.userservice.model.User;
 import ru.gnidenko.userservice.repo.UserRepo;
@@ -65,7 +65,6 @@ public class UserService {
     public UserDto findUser(Long id) {
         User user = userRepo.findById(id)
             .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
-
         return userMapper.toUserDto(user);
     }
 

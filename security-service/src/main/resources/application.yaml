@@ -1,5 +1,7 @@
 server:
   port: 9898
+  servlet:
+    context-path: /s
 spring:
   application:
     name: security-service
