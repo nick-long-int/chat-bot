@@ -1,0 +1,40 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: chat-service
+
+  data:
+    mongodb:
+      database: chat-db
+      host: localhost
+      port: 27017
+      uri: mongodb://localhost:27017/chat-db
+
+
+  cloud:
+    function:
+      definition: producer;consumer
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:29092
+          auto-create-topics: true
+      bindings:
+        producer-out-0:
+          destination: commands-topic
+        consumer-in-0:
+          destination: commands-topic
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+
+commands.topic: producer-out-0
