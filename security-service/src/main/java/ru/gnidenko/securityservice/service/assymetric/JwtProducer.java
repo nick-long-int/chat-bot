@@ -26,6 +26,7 @@ public class JwtProducer {
             .map(UserRole::getRole)
             .collect(Collectors.toSet());
         claims.put("roles", roles);
+        claims.put("userId", userCredential.getId());
 
         return Jwts.builder()
             .setClaims(claims)
