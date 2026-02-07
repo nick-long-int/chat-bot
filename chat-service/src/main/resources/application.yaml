@@ -40,3 +40,6 @@ eureka:
 
 
 commands.topic: producer-out-0
+
+key:
+  public: keys/public.pem
