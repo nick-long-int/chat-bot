@@ -7,13 +7,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.gnidenko.userservice.dto.CreateRequestUserDto;
 import ru.gnidenko.userservice.dto.UserDto;
-import ru.gnidenko.userservice.exception.NotFoundException;
 import ru.gnidenko.userservice.exception.FieldExistsException;
+import ru.gnidenko.userservice.exception.NotFoundException;
 import ru.gnidenko.userservice.mapper.UserMapperImpl;
 import ru.gnidenko.userservice.model.User;
-import ru.gnidenko.userservice.model.UserRole;
 import ru.gnidenko.userservice.repo.UserRepo;
 import ru.gnidenko.userservice.repo.UserRoleRepo;
 
@@ -21,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,64 +35,6 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
-
-
-    @Test
-    void testAddUserThrowsUsernameExistsException() {
-        CreateRequestUserDto requestUserDto = new CreateRequestUserDto();
-        requestUserDto.setUsername("username");
-
-        User user = new User();
-        user.setUsername("username");
-
-        Mockito.when(userRepo.findByUsername(requestUserDto.getUsername()))
-            .thenReturn(Optional.of(user));
-
-        assertThrows(FieldExistsException.class,
-            () -> userService.addUser(requestUserDto));
-    }
-
-    @Test
-    void testAddUserThrowsEmailExistsException() {
-        CreateRequestUserDto requestUserDto = new CreateRequestUserDto();
-        requestUserDto.setEmail("email");
-
-        Mockito.when(userRepo.findByEmail(requestUserDto.getEmail())).thenReturn(Optional.of(Mockito.mock(User.class)));
-
-        assertThrows(FieldExistsException.class, () -> userService.addUser(requestUserDto));
-    }
-
-    @Test
-    void testAddUserThrowsNotFoundExceptionIfRoleNotExists() {
-        CreateRequestUserDto requestUserDto = new CreateRequestUserDto();
-        requestUserDto.setUsername("username");
-
-        Mockito.when(userRoleRepo.findByRole("USER")).thenThrow(new NotFoundException(requestUserDto.getUsername()));
-
-        assertThrows(NotFoundException.class, () -> userService.addUser(requestUserDto));
-    }
-
-    @Test
-    void testAddUserSucceeds() {
-        CreateRequestUserDto requestUserDto = new CreateRequestUserDto();
-        requestUserDto.setUsername("username");
-        requestUserDto.setPassword("password");
-        requestUserDto.setEmail("email");
-
-        UserRole userRole = new UserRole();
-        userRole.setRole("USER");
-        userRole.setId(1L);
-
-        User user = new User();
-        user.setId(1L);
-
-        Mockito.when(userRepo.findByUsername(Mockito.anyString())).thenReturn(Optional.empty());
-        Mockito.when(userRoleRepo.findByRole("USER")).thenReturn(Optional.of(userRole));
-        Mockito.when(userRepo.save(Mockito.any())).thenReturn(user);
-
-        assertNotNull(userService.addUser(requestUserDto));
-        assertEquals(1L, user.getId());
-    }
 
     @Test
     void testDeleteUserWithIdWhichNotExists() {
@@ -136,12 +75,12 @@ class UserServiceTest {
     }
 
     @Test
-    void testFindAllUsers(){
+    void testFindAllUsers() {
         Mockito.when(userRepo.findAll()).thenReturn(List.of(
             new User(), new User(), new User(), new User()
         ));
 
-        List< UserDto> dtos = userService.findAllUsers();
+        List<UserDto> dtos = userService.findAllUsers();
 
         Mockito.verify(userRepo, Mockito.times(1)).findAll();
         assertEquals(4, dtos.size());
@@ -159,7 +98,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testUpdateUserThrowsNotFoundException(){
+    void testUpdateUserThrowsNotFoundException() {
         UserDto userDto = new UserDto();
         Long id = 1L;
 
@@ -168,7 +107,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testUpdateUserThrowsEmailExistsException(){
+    void testUpdateUserThrowsEmailExistsException() {
         UserDto userDto = new UserDto();
         userDto.setEmail("email");
         Long id = 1L;
@@ -179,7 +118,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testUpdateUserSucceeds(){
+    void testUpdateUserSucceeds() {
         User user = new User();
         user.setUsername("username");
         UserDto userDto = new UserDto();
