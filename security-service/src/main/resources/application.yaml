@@ -3,7 +3,23 @@ server:
 spring:
   application:
     name: security-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/chat-bot-db
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+
+key:
+  public: keys/public.pem
+  private: keys/private.pem
