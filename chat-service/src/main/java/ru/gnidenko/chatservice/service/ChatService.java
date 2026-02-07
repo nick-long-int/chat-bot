@@ -1,6 +1,7 @@
 package ru.gnidenko.chatservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.gnidenko.chatservice.dto.ChatDto;
 import ru.gnidenko.chatservice.mapper.ChatMapper;
@@ -10,6 +11,7 @@ import ru.gnidenko.chatservice.repo.ChatRepo;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -23,6 +25,7 @@ public class ChatService {
             newChat.setUserId(userId);
             newChat.setCreatedAt(LocalDateTime.now());
             newChat.setUpdatedAt(LocalDateTime.now());
+            log.info("Create new chat with chatId: {}", newChat.getId());
             return chatMapper.toDto(chatRepo.save(newChat));
         }
         return chatMapper.toDto(chat.get());
