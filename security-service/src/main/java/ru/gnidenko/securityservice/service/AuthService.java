@@ -48,4 +48,11 @@ public class AuthService {
 
         return response;
     }
+
+    public AuthResponse login(String username){
+        AuthResponse response = new AuthResponse();
+        response.setToken(jwtProducer.createToken(new HashMap<>(), username));
+        response.setUsername(username);
+        return response;
+    }
 }

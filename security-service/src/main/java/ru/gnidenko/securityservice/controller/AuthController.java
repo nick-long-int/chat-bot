@@ -2,6 +2,10 @@ package ru.gnidenko.securityservice.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,11 +19,23 @@ import ru.gnidenko.securityservice.service.AuthService;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final AuthenticationManager authManager;
 
     @PostMapping("/register")
     public AuthResponse register(@RequestBody AuthRequest request, HttpServletResponse response) {
         AuthResponse authResponse = authService.register(request);
         response.setStatus(HttpServletResponse.SC_CREATED);
         return authResponse;
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody AuthRequest request) {
+        Authentication auth = authManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
+        if (auth.isAuthenticated()){
+            return authService.login(request.getUsername());
+        }
+        throw new BadCredentialsException("Bad credentials");
     }
 }

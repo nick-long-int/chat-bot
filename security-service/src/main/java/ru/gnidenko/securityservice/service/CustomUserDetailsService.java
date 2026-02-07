@@ -11,7 +11,7 @@ import ru.gnidenko.securityservice.repo.UserCredentialRepo;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private UserCredentialRepo repo;
+    private final UserCredentialRepo repo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
