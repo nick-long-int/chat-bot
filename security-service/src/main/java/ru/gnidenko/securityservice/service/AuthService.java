@@ -10,19 +10,23 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.gnidenko.securityservice.dto.AuthRequest;
 import ru.gnidenko.securityservice.dto.AuthResponse;
 import ru.gnidenko.securityservice.exception.DataValidationException;
+import ru.gnidenko.securityservice.exception.NotFoundException;
 import ru.gnidenko.securityservice.mapper.UserCredentialMapper;
 import ru.gnidenko.securityservice.model.UserCredential;
 import ru.gnidenko.securityservice.repo.UserCredentialRepo;
+import ru.gnidenko.securityservice.repo.UserRoleRepo;
 import ru.gnidenko.securityservice.service.assymetric.JwtProducer;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserCredentialRepo repo;
+    private final UserRoleRepo roleRepo;
     private final UserCredentialMapper mapper;
     private final JwtProducer jwtProducer;
     private final PasswordEncoder passwordEncoder;
@@ -42,17 +46,22 @@ public class AuthService {
         userCredential.setPassword(passwordEncoder.encode(userCredential.getPassword()));
         userCredential.setCreatedAt(LocalDateTime.now());
         userCredential.setUpdatedAt(LocalDateTime.now());
+        userCredential.setRoles(Set.of(
+            roleRepo.findByRole("USER")
+                .orElseThrow(() -> new NotFoundException("Role not found"))
+        ));
 
-        AuthResponse response = mapper.toAuthRespone(repo.save(userCredential));
-        response.setToken(jwtProducer.createToken(new HashMap<>(), request.getUsername()));
+        userCredential = repo.save(userCredential);
+        AuthResponse response = mapper.toAuthRespone(userCredential);
+        response.setToken(jwtProducer.createToken(userCredential));
 
         return response;
     }
 
-    public AuthResponse login(String username){
+    public AuthResponse login(UserCredential userCredential){
         AuthResponse response = new AuthResponse();
-        response.setToken(jwtProducer.createToken(new HashMap<>(), username));
-        response.setUsername(username);
+        response.setToken(jwtProducer.createToken(userCredential));
+        response.setUsername(userCredential.getUsername());
         return response;
     }
 }

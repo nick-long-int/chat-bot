@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.gnidenko.securityservice.dto.AuthRequest;
 import ru.gnidenko.securityservice.dto.AuthResponse;
+import ru.gnidenko.securityservice.model.UserCredential;
 import ru.gnidenko.securityservice.service.AuthService;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -34,7 +37,8 @@ public class AuthController {
             new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
         if (auth.isAuthenticated()){
-            return authService.login(request.getUsername());
+            UserCredential userCredential = (UserCredential) auth.getPrincipal();
+            return authService.login(userCredential);
         }
         throw new BadCredentialsException("Bad credentials");
     }
