@@ -18,6 +18,16 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  servlet:
+    multipart:
+      max-file-size: 2MB
 
 key:
   public: keys/public.pem
+
+minio:
+  endpoint: http://127.0.0.1:9001
+  user: user
+  password: password
+  bucketName: user-service
+

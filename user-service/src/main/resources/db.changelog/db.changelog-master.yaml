@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: ./db.changelog/changeset/V001-init.sql
+  - include:
+      file: ./db.changelog/changeset/V002-append-key-column-to-users.sql

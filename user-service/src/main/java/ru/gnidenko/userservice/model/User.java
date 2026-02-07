@@ -49,6 +49,8 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    private String key;
+
     @ManyToMany
     @JoinTable(
         name = "user_role",
