@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
         return ErrorResponseDto.builder()
             .message(ex.getMessage())
             .timestamp(LocalDateTime.now())
-            .status(400)
+            .status(500)
             .build();
     }
 
