@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.gnidenko.chatservice.dto.ChatDto;
 import ru.gnidenko.chatservice.service.ChatService;
+import ru.gnidenko.chatservice.util.ClaimsExtractor;
 import ru.gnidenko.chatservice.util.ValidationProcessor;
 
 @RestController
@@ -14,12 +15,14 @@ import ru.gnidenko.chatservice.util.ValidationProcessor;
 @RequiredArgsConstructor
 public class ChatController {
 
+    private final ClaimsExtractor extractor;
     private final ChatService chatService;
-    private final ValidationProcessor validation;
 
     @PostMapping
-    public ChatDto joinChat(@RequestParam(value = "userId") Long userId){
-        validation.checkIsNotNull(userId, "userId must not be null");
-        return chatService.joinChat(userId);
+    public ChatDto joinChat(){
+        Long currentId = extractor.getUserIdFromClaims();
+        return chatService.joinChat(currentId);
     }
+
+
 }

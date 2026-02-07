@@ -1,5 +1,7 @@
 server:
   port: 8080
+  servlet:
+    context-path: /u
 spring:
   application:
     name: user-service
@@ -17,4 +19,5 @@ spring:
     hibernate:
       ddl-auto: none
 
-
+key:
+  public: keys/public.pem

@@ -1,5 +1,7 @@
 server:
   port: 8081
+  servlet:
+    context-path: /c
 
 spring:
   application:
@@ -38,3 +40,6 @@ eureka:
 
 
 commands.topic: producer-out-0
+
+key:
+  public: keys/public.pem

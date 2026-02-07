@@ -7,10 +7,32 @@ spring:
   cloud:
     gateway:
       server:
-        webmvc:
+        webflux:
           routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/u/**
+              filters:
+                - AuthFilter
+
+            - id: chat-service
+              uri: lb://chat-service
+              predicates:
+                - Path=/c/**
+              filters:
+                - AuthFilter
+
+            - id: security-service
+              uri:
+                lb://security-service
+              predicates:
+                - Path=/s/**
+
+
+
   main:
-    web-application-type: servlet
+    web-application-type: reactive
 
 eureka:
   client:
@@ -25,3 +47,6 @@ management:
     web:
       exposure:
         include: hystrix.stream, gateway
+
+key:
+  path: keys/public.pem
