@@ -49,6 +49,8 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 
     //Util
+    implementation 'com.itextpdf:layout:9.5.0'
+    implementation 'com.itextpdf:kernel:9.5.0'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.mapstruct:mapstruct:1.6.3'
