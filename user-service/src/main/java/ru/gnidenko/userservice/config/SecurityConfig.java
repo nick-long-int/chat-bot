@@ -27,7 +27,8 @@ public class SecurityConfig {
         return http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/users/**")
+                .requestMatchers("/api/v1/users/**",
+                    "api/v1/pdf/**")
                 .authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt.decoder(jwtDecoder(parsePublicKey))))

@@ -31,3 +31,5 @@ minio:
   password: password
   bucketName: user-service
 
+pdf:
+  path: C:\Users\gnide\Downloads

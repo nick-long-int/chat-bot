@@ -13,6 +13,7 @@ import ru.gnidenko.userservice.repo.S3Repo;
 import ru.gnidenko.userservice.repo.UserRepo;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -41,6 +42,9 @@ public class S3Service {
     )
     public byte[] download(Long userId) {
         User user = findUser(userId);
+        if (Objects.isNull(user.getKey())) {
+            throw new NotFoundException("Key not found");
+        }
         try {
             return s3Repo.get(user.getKey());
         } catch (IOException e) {
@@ -55,6 +59,7 @@ public class S3Service {
     public void delete(Long userId) {
         User user = findUser(userId);
         s3Repo.delete(user.getKey());
+        user.setKey(null);
     }
 
     private User findUser(Long userId) {
